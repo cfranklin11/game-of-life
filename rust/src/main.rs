@@ -2,26 +2,32 @@ extern crate rand;
 
 use std::io;
 use std::cmp::Ordering;
+use rand::Rng;
 
 fn main() {
     const GRID_SIZE: u8 = 5;
-    let mut grid: Vec<Vec<bool>> = Vec::new();
+    let mut rng = rand::thread_rng();
+    let mut grid: Vec<Vec<u8>> = Vec::new();
+    let mut step = 0;
 
     for _n in 0..GRID_SIZE {
-        let mut row: Vec<bool> = Vec::new();
+        let mut row: Vec<u8> = Vec::new();
 
         for _m in 0..GRID_SIZE {
-            row.push(rand::random());
+            row.push(rng.gen_range(0, 2));
         }
 
         grid.push(row);
     }
 
     loop {
-        let mut new_grid: Vec<Vec<bool>> = Vec::new();
+        step += 1;
+        println!("Step {}\n", step);
+
+        let mut new_grid: Vec<Vec<u8>> = Vec::new();
 
         for (row_idx, row) in grid.iter().enumerate() {
-            let mut new_row: Vec<bool> = Vec::new();
+            let mut new_row: Vec<u8> = Vec::new();
 
             for (item_idx, item) in row.iter().enumerate() {
                 let mut neighbors = Vec::new();
@@ -31,7 +37,7 @@ fn main() {
                         Ordering::Greater => (),
                         _ => continue
                     }
-                    let neighbor_row: &Vec<bool> = match grid.get(row_idx + neighbor_row_idx - 1) {
+                    let neighbor_row: &Vec<u8> = match grid.get(row_idx + neighbor_row_idx - 1) {
                         None => continue,
                         Some(ref mut n_row) => n_row
                     };
@@ -44,11 +50,11 @@ fn main() {
                             Ordering::Greater => (),
                             _ => continue
                         }
-                        let neighbor: &bool = match neighbor_row.get(item_idx + neighbor_idx - 1) {
+                        let neighbor: &u8 = match neighbor_row.get(item_idx + neighbor_idx - 1) {
                             None => continue,
                             Some(nbr) => nbr
                         };
-                        if *neighbor {
+                        if *neighbor == 1 {
                             neighbors.push(neighbor);
                         }
                     }
@@ -56,14 +62,14 @@ fn main() {
 
                 match neighbors.len() {
                     2 => {
-                        if *item {
-                            new_row.push(true)
+                        if *item == 1 {
+                            new_row.push(1)
                         } else {
-                            new_row.push(false)
+                            new_row.push(0)
                         }
                     },
-                    3 => new_row.push(true),
-                    _ => new_row.push(false)
+                    3 => new_row.push(1),
+                    _ => new_row.push(0)
                 }
             }
 
